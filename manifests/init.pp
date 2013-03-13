@@ -11,6 +11,11 @@ class vim {
                   'dejavu-fonts-common', 'dejavu-sans-mono-fonts',
                   'libcanberra-gtk2', 'flake8' ]
 
+   $fedora = [  'vim-common', 'vim-enhanced', 'vim-X11',
+                  'ctags', 'gcc', 'make', 'ruby-devel', 'ack', 'git',
+                  'dejavu-fonts-common', 'dejavu-sans-mono-fonts',
+                  'libcanberra-gtk2']
+
     $debpkgs = [  'vim-common', 'vim', 'vim-gtk', 'exuberant-ctags', 'gcc',
                   'make', 'ruby1.8-dev', 'ack-grep', 'git',
                   'ttf-dejavu-core', 'ttf-dejavu-extra',
@@ -18,16 +23,21 @@ class vim {
 
     if $::osfamily == 'Debian' { package { $debpkgs : ensure => installed } }
     else {
-        include yum
-        case $::operatingsystemrelease {
-            default : { package { $el4pkgs :
-                          ensure  => installed } }
-            /^5\./  : { package { $el5pkgs :
-                          ensure  => latest ,
-                          require => File[ '/etc/yum.repos.d/custom.repo' ] } }
-            /^6\./  : { package { $el6pkgs :
-                          ensure  => latest,
-                          require => File[ '/etc/yum.repos.d/custom.repo' ] } }
+        if $::operatingsystem == 'Fedora' {
+            package {$fedora : 
+                     ensure => installed }
+        } else {
+            include yum
+            case $::operatingsystemrelease {
+                default : { package { $el4pkgs :
+                              ensure  => installed } }
+                /^5\./  : { package { $el5pkgs :
+                              ensure  => latest ,
+                              require => File[ '/etc/yum.repos.d/custom.repo' ] } }
+                /^6\./  : { package { $el6pkgs :
+                              ensure  => latest,
+                              require => File[ '/etc/yum.repos.d/custom.repo' ] } }
+            }
         }
     }
 
